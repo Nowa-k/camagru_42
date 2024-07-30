@@ -1,0 +1,38 @@
+version: '3.8'
+services:
+  nginx-service:
+    build: ./nginx/
+    ports:
+      - "8080:80"
+    volumes:
+      - ./application/:/var/www/html/
+      - ./logs/nginx:/var/log/nginx/
+    depends_on:
+      - php-service
+      - mysql-service
+  
+  php-service:
+    build: 
+      context: ./php/
+      args:
+        MSMTPRC_MAIL: ${MSMTPRC_MAIL}
+        MSMTPRC_PASSWORD: ${MSMTPRC_PASSWORD}
+    volumes:
+      - ./application/:/var/www/html/
+      - ./logs/php.log:/var/log/fpm-php.www.log
+    depends_on:
+      - mysql-service
+
+  mysql-service:
+    build:
+      context: ./mysql/
+      args:
+        MYSQL_DATABASE: '${MYSQL_DATABASE}'
+    environment:
+      MYSQL_HOST: ${MYSQL_HOST}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3307:3306"

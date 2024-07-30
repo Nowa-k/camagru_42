@@ -1,0 +1,73 @@
+.picture-item {
+    border-bottom: 1px solid #6A1B9A;
+    padding: 10px;
+    margin: 10px;
+}
+
+.delete-link {
+    color: #6A1B9A;
+    text-decoration: none;
+    float: right;
+    font-weight: bold;
+}
+
+.delete-link:hover {
+    color: #4A136A;
+}
+
+.user-id {
+    color: #6A1B9A;
+    font-size: 1.2em;
+    margin-bottom: 5px;
+}
+
+.ctn-picture {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.picture {
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px;
+}
+
+.ctn-logo {
+    display: flex;
+    flex-direction: row;
+    text-align: center;
+    align-items: center;
+}
+
+.ctn-logo img {
+    width: 25px;
+}
+
+.ctn-logo p {
+    line-height: 0;
+    font-weight: bold;
+}
+
+.action {
+    display: flex;
+    flex-direction: column;
+    margin: 10px;
+}
+
+.bloc-comments {
+    margin: 0 5px;
+    max-height: 500px;
+    overflow-x: auto;
+}
+
+.bloc-comments h3{
+    font-weight: bold;
+    color: #6A1B9A;
+}
+
+.scroll {
+    overflow-y: auto;
+    padding-bottom: 10px;
+}

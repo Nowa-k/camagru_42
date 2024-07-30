@@ -1,0 +1,9 @@
+# Camagru
+
+Web project like instagram
+
+<h2>Command to do </h2>
+
+Use Docker and Docker-Compose 
+
+Do : docker-compose up -d
