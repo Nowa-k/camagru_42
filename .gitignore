@@ -1,0 +1,7 @@
+# Folder
+logs
+application/uploads
+
+# File
+application/.env
+.env

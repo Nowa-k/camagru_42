@@ -19,7 +19,6 @@ services:
         MSMTPRC_PASSWORD: ${MSMTPRC_PASSWORD}
     volumes:
       - ./application/:/var/www/html/
-      - ./logs/php.log:/var/log/fpm-php.www.log
     depends_on:
       - mysql-service
 
