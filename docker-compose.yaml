@@ -15,8 +15,8 @@ services:
     build: 
       context: ./php/
       args:
-        MSMTPRC_MAIL: ${MSMTPRC_MAIL}
-        MSMTPRC_PASSWORD: ${MSMTPRC_PASSWORD}
+        MAIL: ${MAIL}
+        MAIL_PASSWORD: ${MAIL_PASSWORD}
     volumes:
       - ./application/:/var/www/html/
     depends_on:

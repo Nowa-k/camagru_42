@@ -204,26 +204,8 @@ class User {
     } 
 
     public static function mailForValide($to, $code) {
-        try {
-            // Créer une instance de la classe PHPMailer
-            $mail = new PHPMailer(true); // Activer les exceptions dans PHPMailer
-        
-            // Configuration du serveur SMTP
-            $mail->isSMTP();
-            $mail->Host       = 'smtp.gmail.com';
-            $mail->SMTPAuth   = true;
-            $mail->Username   = 'camagruweb@gmail.com';
-            $mail->Password   = "xdxs gotq rtef btzi";
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $mail->Port       = 587;
-            $mail->setFrom('camagruweb@gmail.com', 'Cama');
-            $mail->addAddress($to);
-            $mail->CharSet = 'UTF-8';
-            $mail->Encoding = 'base64';
-            $mail->isHTML(true);
-            $mail->Subject = "Valider son compte";
-            $mail->Body = "
-                <html>
+        $subject = "Valider son compte";
+        $body = "<html>
                 <head>
                     <title>Valider votre compte</title>
                 </head>
@@ -234,12 +216,7 @@ class User {
                     <a href='http://127.0.0.1:8080/index.php?controller=user&action=verify&code=$code' target='_blank' style='background-color: #4CAF50; border: none; color: white; padding: 15px 32px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer; border-radius: 8px;'>Valider mon compte</a>
                 </body>
                 </html>";
-            $mail->send();
-            echo 'L\'e-mail a été envoyé avec succès.';
-        } catch (Exception $e) {
-            // Gérer les erreurs
-            echo "L'envoi de l'email a échoué. Erreur: {$mail->ErrorInfo}";
-        }
+        return self::send_mail($to, $subject, $body);
     }
 
     public static function resetPassword($username, $code, $pwd) {
@@ -262,7 +239,7 @@ class User {
         }
         $code = $user['uuid'];
         $subject = "Demande de nouveau mot de passe";
-        $message = "
+        $body = "
         <html>
         <head>
             <title>Valider votre compte</title>
@@ -273,16 +250,31 @@ class User {
             <a href='http://127.0.0.1:8080/index.php?controller=user&action=forget&code=$code' target='_blank' style='background-color: #4CAF50; border: none; color: white; padding: 15px 32px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer; border-radius: 8px;'>Changer mon mot de passe</a>
             </body>
         </html>";
+        return self::send_mail($to, $subject, $body);
+    }
 
-        $headers = "MIME-Version: 1.0" . "\r\n";
-        $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-        $headers .= "From: ". getenv('MSMTPRC_MAIL') . "\r\n";
-        $headers .= "Reply-To: ". getenv('MSMTPRC_MAIL') . "\r\n";
-
-        if (mail($to, $subject, $message, $headers)) {
-            return "E-mail envoyé avec succès.";
-        } else {
-            return "Erreur lors de l'envoi de l'e-mail.";
+    public static function send_mail($to, $subject,  $body) {
+        try {
+            $mail = new PHPMailer(true);
+        
+            $mail->isSMTP();
+            $mail->Host       = 'smtp.gmail.com';
+            $mail->SMTPAuth   = true;
+            $mail->Username   = getenv('MAIL');
+            $mail->Password   = getenv('MAIL_PASSWORD');
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port       = 587;
+            $mail->setFrom(getenv('MAIL'));
+            $mail->addAddress($to);
+            $mail->CharSet = 'UTF-8';
+            $mail->Encoding = 'base64';
+            $mail->isHTML(true);
+            $mail->Subject = $subject;
+            $mail->Body = $body;
+            $mail->send();
+            return "Email envoyé";
+        } catch (Exception $e) {
+            return "L'envoi de l'email a échoué. Erreur: {$mail->ErrorInfo}";
         }
     }
 }

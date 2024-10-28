@@ -28,8 +28,8 @@ define('DB_HOST', getenv('MYSQL_HOST'));
 define('DB_NAME', getenv('MYSQL_DATABASE'));
 define('DB_USER', getenv('MYSQL_USER'));
 define('DB_PASS', getenv('MYSQL_PASSWORD'));
-define('MSMTPRC_MAIL', getenv('MSMTPRC_MAIL'));
-define('MSMTPRC_PASSWORD', getenv('MSMTPRC_PASSWORD'));
+define('MAIL', getenv('MAIL'));
+define('MAIL_PASSWORD', getenv('MAIL_PASSWORD'));
 
 function getDBConnection() {
     return new PDO('mysql:host=' . DB_HOST . ';dbname=' . DB_NAME, DB_USER, DB_PASS);
