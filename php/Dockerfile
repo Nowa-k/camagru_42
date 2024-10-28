@@ -1,7 +1,5 @@
-# Utilisation de l'image PHP 8.2
 FROM php:8.2-fpm
 
-# Installation des dépendances système nécessaires
 RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg-dev \
@@ -16,14 +14,12 @@ RUN apt-get update && apt-get install -y \
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-RUN mkdir -p /var/www/html/upload && \
-    chown -R www-data:www-data /var/www/html/upload && \
-    chmod -R 755 /var/www/html/upload
+COPY entrypoint.sh /entrypoint.sh
 
-WORKDIR /var/www/html
-
-RUN composer require phpmailer/phpmailer google/apiclient
+RUN chmod +x /entrypoint.sh
 
 EXPOSE 1025
+
+ENTRYPOINT ["/entrypoint.sh"]
 
 CMD ["php-fpm"]

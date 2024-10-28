@@ -1,4 +1,11 @@
 <?php
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+use League\OAuth2\Client\Provider\Google;
+
+require 'vendor/autoload.php';
+
 class Feed {
     public static function getAll($firstResult, $resultsPerPage) {
         $db = getDBConnection();
@@ -232,27 +239,17 @@ class Feed {
             return ;
         }
         $subject = "Vous avez un nouveau commentaire";
-        $message = "
+        $body = "
         <html>
-        <head>
-            <title>Nouveau commentaire</title>
-        </head>
-        <body>
-            <p>Quelqu'un a commenté une de vos publications.</p>
-            <a href='http://127.0.0.1:8080/index.php?controller=feed&action=zoom&code=$idfile' target='_blank' style='background-color: #4CAF50; border: none; color: white; padding: 15px 32px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer; border-radius: 8px;'>Voir la publication</a>
+            <head>
+                <title>Nouveau commentaire</title>
+            </head>
+            <body>
+                <p>Quelqu'un a commenté une de vos publications.</p>
+                <a href='http://127.0.0.1:8080/index.php?controller=feed&action=zoom&code=$idfile' target='_blank' style='background-color: #4CAF50; border: none; color: white; padding: 15px 32px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer; border-radius: 8px;'>Voir la publication</a>
             </body>
         </html>";
-
-        $headers = "MIME-Version: 1.0" . "\r\n";
-        $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-        $headers .= "From: ". getenv('MSMTPRC_MAIL') . "\r\n";
-        $headers .= "Reply-To: ". getenv('MSMTPRC_MAIL') . "\r\n";
-
-        if (mail('a.ferrand69@gmail.com', $subject, $message, $headers)) {
-            return "E-mail envoyé avec succès.";
-        } else {
-            return "Erreur lors de l'envoi de l'e-mail.";
-        }
+        return self::send_mail($user['email'], $subject, $body);
     }
 
     public static function like($user, $file) {
@@ -273,6 +270,30 @@ class Feed {
             $stmt->execute([$file, $user]);
             $stmt = $db->prepare('UPDATE feed SET likes = likes + 1 WHERE id = ?');
             $stmt->execute([$file]);
+        }
+    }
+
+    public static function send_mail($to, $subject,  $body) {
+        try {
+            $mail = new PHPMailer(true);
+            $mail->isSMTP();
+            $mail->Host       = 'smtp.gmail.com';
+            $mail->SMTPAuth   = true;
+            $mail->Username   = getenv('MAIL');
+            $mail->Password   = getenv('MAIL_PASSWORD');
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port       = 587;
+            $mail->setFrom(getenv('MAIL'));
+            $mail->addAddress($to);
+            $mail->CharSet = 'UTF-8';
+            $mail->Encoding = 'base64';
+            $mail->isHTML(true);
+            $mail->Subject = $subject;
+            $mail->Body = $body;
+            $mail->send();
+            return "Email envoyé";
+        } catch (Exception $e) {
+            return "L'envoi de l'email a échoué. Erreur: {$mail->ErrorInfo}";
         }
     }
 }
