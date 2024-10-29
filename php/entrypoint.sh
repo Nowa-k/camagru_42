@@ -2,7 +2,7 @@
 
 if [ ! -d "/var/www/html/uploads" ]; then
   mkdir -p /var/www/html/uploads
-  chown -R www-data:www-data /var/www/html/upload
+  chown -R www-data:www-data /var/www/html/uploads
   chmod -R 755 /var/www/html/uploads
   echo "Dossier 'uploads' créé avec succès et permissions configurées."
 else
