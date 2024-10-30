@@ -69,6 +69,7 @@
         <?php endforeach; ?>
         </div>
     </div>
+    <?php include 'app/views/footer.php'; ?>
 </body>
 </html>
 <script src="/app/script/cam.js"></script>

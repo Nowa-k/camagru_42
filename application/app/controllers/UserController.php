@@ -51,36 +51,28 @@ class UserController {
         exit();
     }
 
-    public function myMailIsValide() {
-        if (isset($_SESSION['valide']) && $_SESSION['valide'] == '0' ) {
-            header("Location: index.php?controller=user&action=verify");
-            exit(); 
-        }
-    }
-
     public function login() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($this->verifyField($_POST['username'], 50) && $this->verifyField($_POST['pwd'], 255))
             {
                 $username = $this->cleanField($_POST['username']);
                 $pwd = $this->cleanField($_POST['pwd']);
-                $res = User::login($username, $pwd);
-                if ($res) {
+                $mess = User::login($username, $pwd);
+                if ($mess === TRUE) {
                     header('Location: index.php');
                 } else {
-                    $mess = "Erreur, username ou mot de passe incorrect.";
                     require 'app/views/user/login.php';
                 }
                 exit();
+            } else {
+                $mess = "Error: Email ou mot de passe invalide";
             }
-        } else {
-            require 'app/views/user/login.php';
         }
+        require 'app/views/user/login.php';
         exit();
     }
 
     public function logout() {
-        // session_start();
         session_destroy();
         header('Location: index.php');
         exit();
@@ -115,18 +107,10 @@ class UserController {
     }
 
     public function verify() {
-        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-            if (isset($_GET['code']) && !empty($_GET['code']) && isset($_SESSION['email'])) {
-                User::valideWithCode($_GET['code'], $_SESSION['email']);
-                header("Location: index.php?controller=user&action=verify");
-                exit();
-            }
-        } else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $mess = User::mailForValide($_SESSION['email'], $_SESSION['uuid']);
-            header("Location: index.php?controller=user&action=verify");
-            exit();
+        if (isset($_GET['code']) && !empty($_GET['code'])) {
+            $message = User::valideWithCode($_GET['code']);
         }
-        require 'app/views/user/verify.php';
+        require 'app/views/user/login.php';
         exit();
     }
 

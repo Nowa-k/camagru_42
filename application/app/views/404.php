@@ -11,5 +11,6 @@
         <h1>404 - Page Not Found</h1>
         <p>La page que vous cherchez n'existe pas. Retournez à la <a href="index.php">page d'accueil</a>.</p>
     </div>
+    <?php include 'app/views/footer.php'; ?>
 </body>
 </html>

@@ -56,6 +56,7 @@
             <h2>Cette publication n'existe pas ou n'existe plus.</h2>
         <?php endif; ?>
     </div>
+    <?php include 'app/views/footer.php'; ?>
 </body>
 </html>
 <script src="/app/script/cam.js"></script>

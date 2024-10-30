@@ -40,6 +40,7 @@
         </form>
         <a href="index.php?controller=user&action=index">Annuler</a>
     </div>
+    <?php include 'app/views/footer.php'; ?>
 </body>
 </html>
 <script src="/app/script/pop.js"></script>

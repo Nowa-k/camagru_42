@@ -66,24 +66,43 @@ class User {
     public static function add($username, $mail, $pwd) {
         $db = getDBConnection();
         if (!self::parsePwd($pwd)) {
-            return "Mot de passe invalide";
+            return "Error: Mot de passe invalide";
         }
         if (!self::parseEmail($mail)) {
-            return "Email invalide";
+            return "Error: Email invalide.";
         }
         $pwdHashed = password_hash($pwd, PASSWORD_DEFAULT);
         $uuid = uniqid();
+    
         try {
             $stmt = $db->prepare('INSERT INTO users (uuid, username, email, pwd) VALUES (?, ?, ?, ?)');
             $result = $stmt->execute([$uuid, $username, $mail, $pwdHashed]);
+    
             if ($result) {
-                return "Votre inscription est un succès.";
+                $link = "http://127.0.0.1:8080/index.php?controller=user&action=verify&code=$uuid";
+                $subject = "Activation de votre compte";
+                $body = "
+                    <html>
+                    <head>
+                        <title>Valider votre compte</title>
+                    </head>
+                    <body style='font-family: Arial, sans-serif; color: #333; line-height: 1.6;'>
+                        <h1 style='color: #4CAF50;'>Bienvenue, $username!</h1>
+                        <p>Merci de vous être inscrit. Veuillez cliquer sur le lien ci-dessous pour activer votre compte :</p>
+                        <p>
+                            <a href='$link' target='_blank' style='background-color: #4CAF50; border: none; color: white; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; border-radius: 8px;'>Activer mon compte</a>
+                        </p>
+                        <p>Si vous n'avez pas créé de compte, ignorez ce message.</p>
+                        <p>Bien cordialement,<br>L'équipe de Mon Application</p>
+                    </body>
+                    </html>";
+                    return self::send_mail($mail, $subject, $body);
             } else {
-                return "Impossible de créer";
+                return "Error: Impossible de créer";
             }
         } catch (PDOException $e) {
         }
-        return "Error";
+        return "Error: Votre username ou email existe déjà.";
     }
 
     public static function login($username, $pwd) {
@@ -93,9 +112,11 @@ class User {
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
     
         if (!$row) {
-            return FALSE;
+            return "Erreur, username incorrect.";
         }
-    
+        if ($row['valide'] !== 1) {
+            return "Erreur: Veuillez valider votre adresse.";
+        }
         if (password_verify($pwd, $row['pwd'])) {
             $_SESSION['id'] = $row['id'];
             $_SESSION['uuid'] = $row['uuid'];
@@ -105,7 +126,7 @@ class User {
             $_SESSION['notif'] = $row['notif'];
             return TRUE;
         } 
-        return FALSE;
+        return "Erreur, mot de passe incorrect.";
     }
 
     public static function updateUsername($id, $username) {
@@ -194,30 +215,15 @@ class User {
         }
     }
 
-    public static function valideWithCode($uuid, $mail) {
+    public static function valideWithCode($uuid) {
         $db = getDBConnection();
-        $stmt = $db->prepare('UPDATE users SET valide = ? WHERE uuid = ? and email = ?');
-        $stmt->execute([1, $uuid, $mail]);
+        $stmt = $db->prepare('UPDATE users SET valide = ? WHERE uuid = ?');
+        $stmt->execute([1, $uuid]);
         if ($stmt->rowCount() == 1) {
-            $_SESSION['valide'] = 1;
+            return "Votre compte est validé. Vous pouvez vous connecter";
         }
+        return "Aucun compte pour votre code";
     } 
-
-    public static function mailForValide($to, $code) {
-        $subject = "Valider son compte";
-        $body = "<html>
-                <head>
-                    <title>Valider votre compte</title>
-                </head>
-                <body>
-                    <h1>Merci de votre inscription sur le site !</h1>
-                    <p>Dernière étape pour valider votre compte et profiter de Camagru.</p>
-                    <p>Cliquer sur le bouton ci-dessous pour valider votre compte :</p>
-                    <a href='http://127.0.0.1:8080/index.php?controller=user&action=verify&code=$code' target='_blank' style='background-color: #4CAF50; border: none; color: white; padding: 15px 32px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer; border-radius: 8px;'>Valider mon compte</a>
-                </body>
-                </html>";
-        return self::send_mail($to, $subject, $body);
-    }
 
     public static function resetPassword($username, $code, $pwd) {
         if (empty($username)) {

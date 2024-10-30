@@ -60,6 +60,7 @@
         <input class="validate" type="submit" value="Valider" />
         </form>
     </div>
+    <?php include 'app/views/footer.php'; ?>
 </body>
 </html>
 <script src="/app/script/pop.js"></script>

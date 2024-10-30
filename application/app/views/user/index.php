@@ -26,6 +26,7 @@
         <a href="index.php?controller=user&action=add">S'inscrire</a>
         <a href="index.php?controller=user&action=login">Se connecter</a>
     </div>
+    <?php include 'app/views/footer.php'; ?>
 </body>
 </html>
 <script src="/app/script/pop.js"></script>
